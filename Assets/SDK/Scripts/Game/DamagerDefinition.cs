@@ -14,7 +14,7 @@ namespace ThunderRoad
         public Direction direction = Direction.All;
         public float penetrationLength = 0;
         public float penetrationDepth = 0f;
-
+        
         public enum Direction
         {
             All,

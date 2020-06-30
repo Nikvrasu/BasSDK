@@ -1,9 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using EasyButtons;
-using System.Reflection;
-using System;
-using UnityEditor;
+using System.Linq;
 
 namespace ThunderRoad
 {
@@ -24,26 +21,6 @@ namespace ThunderRoad
             filteredSounds = new AudioClip[sounds.Count];
         }
 
-#if (UNITY_EDITOR)
-        [Button]
-        public void TestRandomAudioClip()
-        {
-            Assembly assembly = typeof(AudioImporter).Assembly;
-            Type audioUtilType = assembly.GetType("UnityEditor.AudioUtil");
-
-            Type[] typeParams = { typeof(AudioClip), typeof(int), typeof(bool) };
-
-            MethodInfo method = audioUtilType.GetMethod("PlayClip", typeParams);
-
-            AudioClip clip = GetRandomAudioClip(sounds);
-            object[] objParams = { clip, 0, false };
-
-            method.Invoke(null, BindingFlags.Static | BindingFlags.Public, null, objParams, null);
-
-            Debug.Log("Playing clip : " + clip);
-        }
-#endif
-
         public AudioClip PickAudioClip()
         {
             return GetRandomAudioClip(sounds);
@@ -62,7 +39,7 @@ namespace ThunderRoad
             {
                 if (sounds[i] != lastPlayedClip)
                 {
-                    filteredSounds[filteredSoundsCount] = sounds[i];
+                    filteredSounds[i] = sounds[i];
                     filteredSoundsCount++;
                 }
             }
@@ -73,7 +50,7 @@ namespace ThunderRoad
             if (audioClips.Count == 0) return null;
             if (audioClips.Count == 1) return audioClips[0];
             FilterClips(sounds);
-            int index = UnityEngine.Random.Range(0, filteredSoundsCount);
+            int index = UnityEngine.Random.Range(0, filteredSoundsCount - 1);
             lastPlayedClip = filteredSounds[index];
             return lastPlayedClip;
         }

@@ -18,8 +18,6 @@ namespace ThunderRoad
         public bool useScaleCurve;
         public AnimationCurve scaleCurve;
 
-        public bool lookAtTarget;
-
         public bool useSecondaryRenderer;
 
         public bool usePointCache = false;
@@ -132,11 +130,6 @@ namespace ThunderRoad
                     pCache = PointCacheGenerator.ComputePCacheFromMesh(mesh, pointCacheMapSize, pointCachePointCount, pointCacheSeed, pointCacheDistribution, pointCacheBakeMode);
                     vfx.SetTexture("PositionMap", pCache.positionMap);
                     if (vfx.HasTexture("NormalMap")) vfx.SetTexture("NormalMap", pCache.normalMap);
-                    if (!pointCacheSkinnedMeshUpdate)
-                    {
-                        pCache.Dispose();
-                        pCache = null;
-                    }
                 }
                 else
                 {
@@ -166,12 +159,7 @@ namespace ThunderRoad
                         }
                         pCache = PointCacheGenerator.ComputePCacheFromMesh(mesh, pointCacheMapSize, pointCachePointCount, pointCacheSeed, pointCacheDistribution, pointCacheBakeMode);
                         vfx.SetTexture("PositionMap", pCache.positionMap);
-                        if (vfx.HasTexture("NormalMap")) vfx.SetTexture("NormalMap", pCache.normalMap);
-                        if (!pointCacheSkinnedMeshUpdate)
-                        {
-                            pCache.Dispose();
-                            pCache = null;
-                        }
+                        if (vfx.HasTexture("NormalMap")) vfx.SetTexture("NormalMap", pCache.normalMap);        
                     }
                     else
                     {
@@ -226,10 +214,6 @@ namespace ThunderRoad
 
         public void Update()
         {
-            if (lookAtTarget)
-            {
-                this.transform.LookAt(2 * this.transform.position - targetTransform.position, Vector3.up);
-            }
             UpdateSource();
             UpdateTarget();
             if (stopping && vfx.aliveParticleCount == 0)
@@ -277,7 +261,6 @@ namespace ThunderRoad
             pointCacheSkinnedMeshRenderer = null;
             CancelInvoke();
             vfx.Stop();
-            lookAtTarget = false;
             vfx.enabled = false;
 #if ProjectCore
             if (Application.isPlaying)
