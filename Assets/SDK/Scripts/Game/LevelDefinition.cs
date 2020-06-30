@@ -69,7 +69,6 @@ namespace ThunderRoad
                     Debug.LogError("No character found in saves");
                     GameManager.playerData = new CharacterData("Temp", "Temp");
                 }
-                GameManager.playerData.UpdateVersion();
             }
         }
 
@@ -163,9 +162,8 @@ namespace ThunderRoad
                     Creature playerCreature = null;
                     try
                     {
-                        playerCreature = Catalog.GetData<CreatureData>(GameManager.playerData.creatureId).Instantiate(playerStart.position, playerStart.rotation);
+                        playerCreature = Catalog.GetData<CreatureData>(GameManager.playerData.GetCreatureID()).Spawn(playerStart.position, playerStart.rotation, false);
                         playerCreature.container.containerID = null;
-                        playerCreature.loadUmaPreset = false;
                         playerCreature.container.content = GameManager.playerData.inventory;
                     }
                     catch (Exception e)
@@ -173,7 +171,9 @@ namespace ThunderRoad
                         LoadingCamera.SetState(LoadingCamera.State.Error);
                         throw;
                     }
-                    
+
+                    while (!playerCreature.initialized) yield return new WaitForEndOfFrame();
+
                     if (playerCreature.umaCharacter)
                     {
                         try
@@ -212,6 +212,7 @@ namespace ThunderRoad
             if (data.musicAudioContainer)
             {
                 music = this.gameObject.AddComponent<AudioSource>();
+                music.loop = true;
                 music.outputAudioMixerGroup = GameManager.GetAudioMixerGroup(AudioMixerName.Music);
                 music.clip = data.musicAudioContainer.PickAudioClip();
                 music.Play();
